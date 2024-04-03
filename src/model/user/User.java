@@ -4,9 +4,7 @@ import model.account.Account;
 import model.account.CheckingAccount;
 import user.Address;
 
-import java.io.Console;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -31,7 +29,7 @@ public class User {
     {
         this.id = contorId++;
     }
-    public User( String firstName, String lastName, String email, String password, String phoneNumber, Date dateOfBirth, Address address, List<Account> accountList) {
+    public User(String firstName, String lastName, String email, String password, String phoneNumber, Date dateOfBirth, Address address, List<Account> accountList) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -48,43 +46,44 @@ public class User {
         System.out.println("Last name: ");
         this.lastName = in.nextLine();
 
-        System.out.println("Email: ");
-        do {
-            this.email = in.nextLine();
-            if (!isValidEmail(email)) {
-                System.out.println("Invalid email address. Please try again:");
-            }
-        } while (!isValidEmail(email));
-
-        System.out.println("Phone number: ");
-        do {
-            this.phoneNumber = in.nextLine();
-            if (!isPhoneNumberValid(phoneNumber)) {
-                System.out.println("Invalid phone number. Please try again:");
-            }
-        } while (!isPhoneNumberValid(phoneNumber));
-
-        System.out.println("Birth Date (yyyy-mm-dd): ");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false);
-        boolean validInput = false;
-        do {
-            String userInput = in.nextLine();
-
-            try {
-                dateOfBirth = dateFormat.parse(userInput);
-                if (dateOfBirth.after(new Date())) {
-                    System.out.println("Birth date cannot be in the future. Please try again.");
-                } else {
-                    validInput = true;
-                }
-            } catch (ParseException e) {
-                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
-            }
-        } while (!validInput);
-
-        System.out.println("\tAddress");
+//        System.out.println("Email: ");
+//        do {
+//            this.email = in.nextLine();
+//            if (!isValidEmail(email)) {
+//                System.out.println("Invalid email address. Please try again:");
+//            }
+//        } while (!isValidEmail(email));
+//
+//        System.out.println("Phone number: ");
+//        do {
+//            this.phoneNumber = in.nextLine();
+//            if (!isPhoneNumberValid(phoneNumber)) {
+//                System.out.println("Invalid phone number. Please try again:");
+//            }
+//        } while (!isPhoneNumberValid(phoneNumber));
+//
+//        System.out.println("Birth Date (yyyy-mm-dd): ");
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        dateFormat.setLenient(false);
+//        boolean validInput = false;
+//        do {
+//            String userInput = in.nextLine();
+//
+//            try {
+//                dateOfBirth = dateFormat.parse(userInput);
+//                if (dateOfBirth.after(new Date())) {
+//                    System.out.println("Birth date cannot be in the future. Please try again.");
+//                } else {
+//                    validInput = true;
+//                }
+//            } catch (ParseException e) {
+//                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
+//            }
+//        } while (!validInput);
+//
+//        System.out.println("\tAddress");
         this.address = new Address(in);
+        this.accountList = new ArrayList<>();
     }
     public static boolean isValidEmail(String email) {
         String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
@@ -109,26 +108,13 @@ public class User {
         String newPassword;
         String confirmPassword;
 
-        Console console = System.console();
-        if (console == null) {
-            Scanner in = new Scanner(System.in);
-            do {
-                System.out.print("Enter your password: ");
-                newPassword = in.nextLine();
-
-                System.out.print("Confirm your password: ");
-                confirmPassword = in.nextLine();
-
-                if (!newPassword.equals(confirmPassword)) {
-                    System.out.println("Passwords do not match. Please try again.");
-                }
-            } while (!newPassword.equals(confirmPassword));
-            return;
-        }
-
+        Scanner in = new Scanner(System.in);
         do {
-            newPassword = new String(console.readPassword("Enter your password: "));
-            confirmPassword = new String(console.readPassword("Confirm your password: "));
+            System.out.print("Enter your password: ");
+            newPassword = in.nextLine();
+
+            System.out.print("Confirm your password: ");
+            confirmPassword = in.nextLine();
 
             if (!newPassword.equals(confirmPassword)) {
                 System.out.println("Passwords do not match. Please try again.");
@@ -140,20 +126,33 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", address=" + address +
-                ", accountList=" + accountList +
-                '}';
+        return  "-------------------" +
+                "\nid: " + id +
+                "\nfirstName: " + firstName +
+                "\nlastName: " + lastName +
+                "\nemail: " + email +
+                "\npassword: " + password +
+                "\nphoneNumber: " + phoneNumber +
+                "\ndateOfBirth: " + dateOfBirth +
+                "\naddress: " + address +
+                "\naccountList: " + listAccounts() +
+                "\n-------------------";
     }
-
+    private String listAccounts(){
+        StringBuilder sb = new StringBuilder();
+        for(Account account: accountList)
+            sb.append(account);
+        return String.valueOf(sb);
+    }
     public List<Account> getAccountList() {
         return accountList;
+    }
+
+    public boolean passwordIsSet() {
+        return password != null && !password.isEmpty();
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

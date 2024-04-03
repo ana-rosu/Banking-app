@@ -14,13 +14,12 @@ public class Bank {
     public Bank() {
         this.users = new ArrayList<>();
     }
-    public void addUser(double initialBalance) throws ParseException {
-        Scanner in = new Scanner(System.in);
-        User user = new User(in);
-        users.add(user);
-        CheckingAccount checkingAccount = new CheckingAccount(initialBalance);
-        user.addCheckingAccount(checkingAccount);
-        System.out.println("User created successfully with ID: " + user.getId());
-        System.out.println("Checking account opened successfully for user: " + user.getId());
+
+    public Bank(List<User> users) {
+        this.users = users;
+    }
+
+    public List<User> getUsers() {
+        return users;
     }
 }

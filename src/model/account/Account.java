@@ -51,4 +51,14 @@ public abstract class Account implements Transactionable, Accountable {
     public List<Transaction> getTransactionHistory() {
         return transactionHistory;
     }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", IBAN='" + IBAN + '\'' +
+                ", balance=" + balance +
+                ", transactionHistory=" + transactionHistory +
+                '}';
+    }
 }
