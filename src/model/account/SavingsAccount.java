@@ -12,6 +12,10 @@ public class SavingsAccount extends Account{
     private final double depositLimit;
     private final double withdrawalLimitPerMonth;
 
+    public SavingsAccount(double balance) {
+        super(balance);
+    }
+
     public SavingsAccount(double balance, Date startDate, Date endDate, double interestRate, double depositLimit, double withdrawalLimitPerMonth) {
         super(balance);
         this.startDate = startDate;

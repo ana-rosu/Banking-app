@@ -61,4 +61,7 @@ public abstract class Account implements Transactionable, Accountable {
                 ", transactionHistory=" + transactionHistory +
                 '}';
     }
+    public void addTransaction(Transaction transaction){
+        this.transactionHistory.add(transaction);
+    }
 }

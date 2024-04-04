@@ -2,6 +2,7 @@ package model.user;
 
 import model.account.Account;
 import model.account.CheckingAccount;
+import model.account.SavingsAccount;
 import user.Address;
 
 import java.util.ArrayList;
@@ -103,7 +104,6 @@ public class User {
     public void addCheckingAccount(CheckingAccount checkingAccount){
         accountList.add(checkingAccount);
     }
-
     public void setPassword() {
         String newPassword;
         String confirmPassword;
@@ -138,7 +138,7 @@ public class User {
                 "\naccountList: " + listAccounts() +
                 "\n-------------------";
     }
-    private String listAccounts(){
+    public String listAccounts(){
         StringBuilder sb = new StringBuilder();
         for(Account account: accountList)
             sb.append(account);
@@ -155,4 +155,14 @@ public class User {
     public String getPassword() {
         return password;
     }
+//    public List<Account> addAccount(String accType){
+//        Account acc = null;
+//        if(accType.equals("checking")){
+//            acc = new CheckingAccount(0.0);
+//        }
+//        else{
+//            acc = new SavingsAccount(0.0);
+//        }
+////        return accountList.add(acc);
+//    }
 }

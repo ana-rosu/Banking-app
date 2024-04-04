@@ -1,5 +1,6 @@
 package service;
 
+import model.account.Account;
 import model.account.CheckingAccount;
 import model.user.User;
 
@@ -7,6 +8,8 @@ import java.util.List;
 
 public class UserService {
     private static List<User> users;
+    public UserService(){
+    }
     public UserService(List<User> users) {
         UserService.users = users;
     }
@@ -72,5 +75,12 @@ public class UserService {
         currentUser.setPassword();
         return true;
     }
-
+    public String viewAllAccounts(int userId){
+        User user = getUserById(userId);
+        return user.listAccounts();
+    }
+//    public void openNewAccount(int userId){
+//        User user = getUserById(userId);
+//
+//    }
 }
