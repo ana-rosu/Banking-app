@@ -8,25 +8,13 @@ public class CheckingAccount extends Account {
         super(balance);
     }
     @Override
-    public void deposit(double amount) {
-        setBalance(getBalance() + amount);
-    }
-    @Override
-    public void withdraw(double amount) {
-        // Implement withdraw logic
-    }
-    @Override
-    public void transfer(Account destination, double amount) {
-        // Implement transfer logic
-    }
-    @Override
-    public double getBalance() {
-        // Implement getBalance logic
-        return balance;
-    }
-    @Override
-    public void setBalance(double balance) {
-        // Implement setBalance logic
-        this.balance = balance;
+    public String toString() {
+        return "CheckingAccount{" +
+                "id=" + id +
+                ", IBAN='" + IBAN + '\'' +
+                ", balance=" + balance +
+                ", transactionHistory=" + transactionHistory +
+                ", linkedCard=" + linkedCard +
+                '}';
     }
 }
