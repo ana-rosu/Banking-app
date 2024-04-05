@@ -3,7 +3,9 @@ package model.account;
 import model.card.Card;
 import model.transaction.Transaction;
 import interfaces.Transactionable;
+import model.transaction.TransactionType;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -29,6 +31,8 @@ public abstract class Account implements Transactionable {
     public void deposit(double amount) {
         if(amount > 0){
             setBalance(balance + amount);
+            Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Deposit", new Date(), TransactionType.DEPOSIT);
+            transactionHistory.add(transaction);
         }
     }
     @Override
@@ -38,6 +42,8 @@ public abstract class Account implements Transactionable {
             return false;
         }
         this.balance -= amount;
+        Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Withdrawal", new Date(), TransactionType.WITHDRAWAL);
+        this.transactionHistory.add(transaction);
         return true;
     }
 
@@ -46,6 +52,10 @@ public abstract class Account implements Transactionable {
         if (amount > 0 && this.withdraw(amount)) {
             destination.deposit(amount);
             System.out.println("Transfer successful.");
+            Transaction toDest = new Transaction(this.getIBAN(), destination.getIBAN(), amount, "Transfer to " + destination.getIBAN(), new Date(), TransactionType.TRANSFER);
+            Transaction fromSource = new Transaction(this.getIBAN(), destination.getIBAN(), amount, "Transfer from " + this.getIBAN(), new Date(), TransactionType.TRANSFER);
+            transactionHistory.add(toDest);
+            destination.transactionHistory.add(fromSource);
         } else {
             System.out.println("Transfer failed. Insufficient funds.");
         }
@@ -88,8 +98,5 @@ public abstract class Account implements Transactionable {
     }
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
-    }
-    public void addTransaction(Transaction transaction){
-        this.transactionHistory.add(transaction);
     }
 }

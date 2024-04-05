@@ -7,6 +7,13 @@ public class CheckingAccount extends Account {
     public CheckingAccount(double balance){
         super(balance);
     }
+
+    @Override
+    public void deposit(double amount) {
+        super.deposit(amount);
+        System.out.println("Deposited $" + amount + " into Checkings Account.");
+    }
+
     @Override
     public String toString() {
         return "CheckingAccount{" +
