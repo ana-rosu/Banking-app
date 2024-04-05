@@ -38,6 +38,8 @@ This banking application consists of multiple classes and services designed to f
     - Issue Debit Card associated with the account
     - View Card Details
     - Close Account
+  
+> Disclaimer! "Open a new account" functionality is not implemented yet! 
 
 ### Bank representative actions
 
