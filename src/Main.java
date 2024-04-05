@@ -1,14 +1,20 @@
 
 import model.account.Account;
 import model.user.User;
+import service.AccountService;
 import service.UserService;
+import utils.UserUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+
 
 
 public class Main {
     private static final UserService userService = new UserService();
+    private static final AccountService accountService = new AccountService();
+    private static final UserUtils userUtils = new UserUtils();
     private static void displayMainMenu() {
         System.out.println("\nMENIU");
         System.out.println("1. Bank");
@@ -77,9 +83,10 @@ public class Main {
                     userService.registerUser(user, initialBalance);
                     break;
                 case 2:
-                    List<User> users = userService.getUsers();
-                    for(User u: users)
-                        System.out.println(u);
+                    Map<Integer, User> users = userUtils.getUsers();
+                    for (User usr : users.values()) {
+                        System.out.println(usr);
+                    }
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
@@ -137,7 +144,7 @@ public class Main {
                     return;
                 case 1:
                     System.out.println("Please enter the id of the account you wish to manage from the list below:\n");
-                    String accounts = userService.viewAllAccounts(loggedInUserId);
+                    String accounts = accountService.viewAllAccounts(loggedInUserId);
                     System.out.println(accounts);
                     break;
                 case 2:
