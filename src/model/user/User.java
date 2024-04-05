@@ -2,13 +2,7 @@ package model.user;
 
 import model.account.Account;
 import model.account.CheckingAccount;
-import model.account.SavingsAccount;
-import user.Address;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,11 +24,10 @@ public class User {
     {
         this.id = contorId++;
     }
-    public User(String firstName, String lastName, String email, String password, String phoneNumber, Date dateOfBirth, Address address, List<Account> accountList) {
+    public User(String firstName, String lastName, String email, String phoneNumber, Date dateOfBirth, Address address, List<Account> accountList) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.password = password;
         this.phoneNumber = phoneNumber;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
@@ -83,7 +76,7 @@ public class User {
 //        } while (!validInput);
 //
 //        System.out.println("\tAddress");
-        this.address = new Address(in);
+//        this.address = new Address(in);
         this.accountList = new ArrayList<>();
     }
     public static boolean isValidEmail(String email) {
@@ -124,26 +117,14 @@ public class User {
         this.password = newPassword;
     }
 
-    @Override
-    public String toString() {
-        return  "-------------------" +
-                "\nid: " + id +
-                "\nfirstName: " + firstName +
-                "\nlastName: " + lastName +
-                "\nemail: " + email +
-                "\npassword: " + password +
-                "\nphoneNumber: " + phoneNumber +
-                "\ndateOfBirth: " + dateOfBirth +
-                "\naddress: " + address +
-                "\naccountList: " + listAccounts() +
-                "\n-------------------";
+    public String getFirstName() {
+        return firstName;
     }
-    public String listAccounts(){
-        StringBuilder sb = new StringBuilder();
-        for(Account account: accountList)
-            sb.append(account);
-        return String.valueOf(sb);
+
+    public String getLastName() {
+        return lastName;
     }
+
     public List<Account> getAccountList() {
         return accountList;
     }
@@ -155,14 +136,30 @@ public class User {
     public String getPassword() {
         return password;
     }
-//    public List<Account> addAccount(String accType){
-//        Account acc = null;
-//        if(accType.equals("checking")){
-//            acc = new CheckingAccount(0.0);
-//        }
-//        else{
-//            acc = new SavingsAccount(0.0);
-//        }
-////        return accountList.add(acc);
-//    }
+    @Override
+    public String toString() {
+        return  "-------------------" +
+                "\nid: " + id +
+                "\nfirstName: " + firstName +
+                "\nlastName: " + lastName +
+                "\nemail: " + email +
+                "\npassword: " + password +
+                "\nphoneNumber: " + phoneNumber +
+                "\ndateOfBirth: " + dateOfBirth +
+                "\naddress: " + address +
+                "\n-------------------";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(phoneNumber, user.phoneNumber) && Objects.equals(dateOfBirth, user.dateOfBirth) && Objects.equals(address, user.address) && Objects.equals(accountList, user.accountList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, email, password, phoneNumber, dateOfBirth, address, accountList);
+    }
 }

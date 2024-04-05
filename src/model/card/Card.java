@@ -18,12 +18,6 @@ public class Card {
         this.cardNumber = generatedNumber;
         usedNumbers.add(this.cardNumber);
     }
-    public Card(Card card){
-        this.cardNumber = card.cardNumber;
-        this.cardHolderName = card.cardHolderName;
-        this.CVV = card.CVV;
-        this.expiryDate = card.expiryDate;
-    }
     private Date generateExpiryDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -44,18 +38,14 @@ public class Card {
         var rand = new Random();
         return 100 + rand.nextInt(899);
     }
-    public String getCardHolderName() {
-        return cardHolderName;
-    }
 
-    public String getCardNumber() {
-        return cardNumber;
-    }
-
-    public int getCVV() {
-        return CVV;
-    }
-    public Date getExpiryDate() {
-        return expiryDate;
+    @Override
+    public String toString() {
+        return "Card{" +
+                "cardNumber='" + cardNumber + '\'' +
+                ", cardHolderName='" + cardHolderName + '\'' +
+                ", expiryDate=" + expiryDate +
+                ", CVV=" + CVV +
+                '}';
     }
 }

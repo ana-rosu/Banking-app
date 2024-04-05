@@ -5,9 +5,7 @@ import model.transaction.Transaction;
 import interfaces.Transactionable;
 import model.transaction.TransactionType;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public abstract class Account implements Transactionable {
     protected int id;
@@ -17,14 +15,21 @@ public abstract class Account implements Transactionable {
     protected List<Transaction> transactionHistory;
     protected Card linkedCard;
     protected AccountStatus accountStatus;
+    static private Set<String> usedIBAN = new HashSet<>();
 
     {
         this.id = contorId++;
     }
     public Account(double balance) {
-        this.IBAN = generateIban();
+        String generatedIBAN = this.generateIban();
+        while(usedIBAN.contains(generatedIBAN))
+            generatedIBAN = this.generateIban();
+        this.IBAN = generatedIBAN;
+        usedIBAN.add(this.IBAN);
+
         this.balance = balance;
         this.accountStatus = AccountStatus.OPEN;
+        this.transactionHistory = new ArrayList<>();
     }
 
     @Override
@@ -47,7 +52,6 @@ public abstract class Account implements Transactionable {
         return true;
     }
 
-    @Override
     public void transfer(Account destination, double amount) {
         if (amount > 0 && this.withdraw(amount)) {
             destination.deposit(amount);
@@ -98,5 +102,18 @@ public abstract class Account implements Transactionable {
     }
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return id == account.id && Double.compare(balance, account.balance) == 0 && Objects.equals(IBAN, account.IBAN) && Objects.equals(transactionHistory, account.transactionHistory) && Objects.equals(linkedCard, account.linkedCard) && accountStatus == account.accountStatus;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, IBAN, balance, transactionHistory, linkedCard, accountStatus);
     }
 }
