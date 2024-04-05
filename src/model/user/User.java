@@ -2,6 +2,9 @@ package model.user;
 
 import model.account.Account;
 import model.account.CheckingAccount;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,43 +43,43 @@ public class User {
         System.out.println("Last name: ");
         this.lastName = in.nextLine();
 
-//        System.out.println("Email: ");
-//        do {
-//            this.email = in.nextLine();
-//            if (!isValidEmail(email)) {
-//                System.out.println("Invalid email address. Please try again:");
-//            }
-//        } while (!isValidEmail(email));
-//
-//        System.out.println("Phone number: ");
-//        do {
-//            this.phoneNumber = in.nextLine();
-//            if (!isPhoneNumberValid(phoneNumber)) {
-//                System.out.println("Invalid phone number. Please try again:");
-//            }
-//        } while (!isPhoneNumberValid(phoneNumber));
-//
-//        System.out.println("Birth Date (yyyy-mm-dd): ");
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        dateFormat.setLenient(false);
-//        boolean validInput = false;
-//        do {
-//            String userInput = in.nextLine();
-//
-//            try {
-//                dateOfBirth = dateFormat.parse(userInput);
-//                if (dateOfBirth.after(new Date())) {
-//                    System.out.println("Birth date cannot be in the future. Please try again.");
-//                } else {
-//                    validInput = true;
-//                }
-//            } catch (ParseException e) {
-//                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
-//            }
-//        } while (!validInput);
-//
-//        System.out.println("\tAddress");
-//        this.address = new Address(in);
+        System.out.println("Email: ");
+        do {
+            this.email = in.nextLine();
+            if (!isValidEmail(email)) {
+                System.out.println("Invalid email address. Please try again:");
+            }
+        } while (!isValidEmail(email));
+
+        System.out.println("Phone number: ");
+        do {
+            this.phoneNumber = in.nextLine();
+            if (!isPhoneNumberValid(phoneNumber)) {
+                System.out.println("Invalid phone number. Please try again:");
+            }
+        } while (!isPhoneNumberValid(phoneNumber));
+
+        System.out.println("Birth Date (yyyy-mm-dd): ");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        boolean validInput = false;
+        do {
+            String userInput = in.nextLine();
+
+            try {
+                dateOfBirth = dateFormat.parse(userInput);
+                if (dateOfBirth.after(new Date())) {
+                    System.out.println("Birth date cannot be in the future. Please try again.");
+                } else {
+                    validInput = true;
+                }
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
+            }
+        } while (!validInput);
+
+        System.out.println("\tAddress");
+        this.address = new Address(in);
         this.accountList = new ArrayList<>();
     }
     public static boolean isValidEmail(String email) {

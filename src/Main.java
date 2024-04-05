@@ -153,7 +153,7 @@ public class Main {
                 case 0:
                     return;
                 case 1:
-                    System.out.println("Please enter the id of the account you wish to manage from the list below:");
+                    System.out.println("Please enter the id of the account you wish to manage from the list below:\n");
                     String accounts = accountService.viewAllAccounts(loggedInUserId);
                     System.out.println(accounts);
                     int accountId = scanner.nextInt();
