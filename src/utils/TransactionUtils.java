@@ -4,10 +4,7 @@ import model.transaction.Transaction;
 import model.transaction.TransactionType;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.text.ParseException;
 
 public class TransactionUtils {
@@ -47,11 +44,19 @@ public class TransactionUtils {
                 System.out.println("The date cannot be in the future. Please try again.");
                 return;
             }
-            System.out.println("Transactions on " + dateString + ":");
+            List<Transaction> showTransactions = new ArrayList<>();
             for (Transaction transaction : transactions) {
                 if (dateFormat.format(transaction.getDate()).equals(dateFormat.format(searchDate))) {
-                    System.out.println(transaction);
+                    showTransactions.add(transaction);
                 }
+            }
+            if (showTransactions.isEmpty()){
+                System.out.println("No transactions on" + dateString);
+            }
+            else{
+                System.out.println("Transactions on " + dateString + ":");
+                for(Transaction transaction : showTransactions)
+                    System.out.println(transaction);
             }
         } catch (ParseException e) {
             System.out.println("Invalid date format. Please use yyyy-mm-dd.");
