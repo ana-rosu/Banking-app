@@ -5,12 +5,15 @@ import model.user.User;
 import utils.AccountUtils;
 import utils.UserUtils;
 
+import java.util.ArrayList;
+
 public class UserService {
     private UserUtils users;
     private AccountUtils accounts;
 
-    public UserService(UserUtils users) {
+    public UserService(UserUtils users, AccountUtils accounts) {
         this.users = users;
+        this.accounts = accounts;
     }
 
     public void registerUser(User user, double initialBalance) {

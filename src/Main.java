@@ -20,7 +20,7 @@ import java.util.*;
 public class Main {
     private static final UserUtils userUtils = new UserUtils();
     private static final AccountUtils accountUtils = new AccountUtils();
-    private static final UserService userService = new UserService(userUtils);
+    private static final UserService userService = new UserService(userUtils, accountUtils);
     private static final AccountService accountService = new AccountService(userUtils);
 
     private static void displayMainMenu() {
@@ -350,9 +350,9 @@ public class Main {
         accountList.add(checkingAccount1);
         accountList.add(savingsAccount1);
         User user1 = new User("Andrei", "Popescu", "andrei.popescu@example.com", "0883132981", new Date(94, Calendar.FEBRUARY, 1), address1, accountList);
-        userUtils.addUser(user1);
         accountUtils.addAccount(checkingAccount1);
         accountUtils.addAccount(savingsAccount1);
+        userUtils.addUser(user1);
 
         Scanner scanner = new Scanner(System.in);
         int choice;
