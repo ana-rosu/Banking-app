@@ -24,7 +24,7 @@ public class UserService {
         System.out.println("User created successfully with ID: " + user.getId());
         System.out.println("Checking account opened successfully for user: " + user.getId());
     }
-    public boolean login(int userId, String password) {
+    public boolean checkLogin(int userId){
         boolean isRegistered = users.isUserRegistered(userId);
 
         if (!isRegistered) {
@@ -36,13 +36,16 @@ public class UserService {
         if (!currentUser.passwordIsSet()) {
             System.out.println("You need to activate your account.");
             return false;
+        }
+        return true;
+    }
+    public boolean login(int userId, String password) {
+        User currentUser = users.getUserById(userId);
+        if (!password.equals(currentUser.getPassword())) {
+            System.out.println("Wrong password!");
+            return false;
         } else {
-            if (!password.equals(currentUser.getPassword())) {
-                System.out.println("Wrong password!");
-                return false;
-            } else {
-                return true;
-            }
+            return true;
         }
     }
     public boolean activateAccount(int userId){
