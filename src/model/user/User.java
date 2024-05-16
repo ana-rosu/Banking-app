@@ -132,6 +132,9 @@ public class User {
         return accountList;
     }
 
+    public void setAccountList(List<Account> accountList) {
+        this.accountList = accountList;
+    }
     public boolean passwordIsSet() {
         return password != null && !password.isEmpty();
     }
@@ -151,18 +154,5 @@ public class User {
                 "\ndateOfBirth: " + dateOfBirth +
                 "\naddress: " + address +
                 "\n-------------------";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id == user.id && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(phoneNumber, user.phoneNumber) && Objects.equals(dateOfBirth, user.dateOfBirth) && Objects.equals(address, user.address) && Objects.equals(accountList, user.accountList);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email, password, phoneNumber, dateOfBirth, address, accountList);
     }
 }

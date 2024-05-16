@@ -1,6 +1,7 @@
 package service;
 
 import model.account.Account;
+import model.account.AccountType;
 import model.account.CheckingAccount;
 import model.account.SavingsAccount;
 import model.transaction.Transaction;
@@ -43,7 +44,20 @@ public class AccountService {
         }
         return sb.toString();
     }
-
+    public void openNewAccount(int userId, AccountType accType){
+        Account account;
+        if (accType == AccountType.CHECKING) {
+            account = new CheckingAccount(0);
+        } else {
+            Date startDate = new Date();
+            Date endDate = new Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000);
+            account = new SavingsAccount(0, startDate, endDate);
+        }
+        User user = users.getUserById(userId);
+        List<Account> accounts = user.getAccountList();
+        accounts.add(account);
+        user.setAccountList(accounts);
+    }
 
     public void generateStatement(Date fromDate, Date toDate, int userId, int accountId) {
         Account account = getAccount(userId, accountId);

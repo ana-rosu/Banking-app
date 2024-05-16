@@ -105,15 +105,14 @@ public abstract class Account implements Transactionable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Account account = (Account) o;
-        return id == account.id && Double.compare(balance, account.balance) == 0 && Objects.equals(IBAN, account.IBAN) && Objects.equals(transactionHistory, account.transactionHistory) && Objects.equals(linkedCard, account.linkedCard) && accountStatus == account.accountStatus;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, IBAN, balance, transactionHistory, linkedCard, accountStatus);
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", IBAN='" + IBAN + '\'' +
+                ", balance=" + balance +
+                ", transactionHistory=" + transactionHistory +
+                ", linkedCard=" + linkedCard +
+                ", accountStatus=" + accountStatus +
+                '}';
     }
 }

@@ -1,7 +1,4 @@
-import model.account.Account;
-import model.account.AccountStatus;
-import model.account.CheckingAccount;
-import model.account.SavingsAccount;
+import model.account.*;
 import model.card.Card;
 import model.transaction.Transaction;
 import model.transaction.TransactionType;
@@ -128,8 +125,10 @@ public class Main {
                     System.out.println("\n------Enter your credentials------");
                     System.out.println("\nId: ");
                     userId = scanner.nextInt();
-                    System.out.println("Password: ");
-                    scanner.nextLine();
+                    if(!userService.checkLogin(userId)){
+                        return;
+                    }
+                    System.out.println("\nPassword: ");
                     String password = scanner.nextLine();
                     if(userService.login(userId, password)) {
                         handleLoggedInCustomerMenu(scanner, userId);
@@ -166,7 +165,17 @@ public class Main {
                     System.out.println("Account with id provided does not exist!");
                     break;
                 case 2:
-//                    accountService.openNewAccount();
+                    System.out.println("\nWhat type of account would you like to open?");
+                    System.out.println("\n[1] - Checking, [2] - Savings: ");
+                    choice = scanner.nextInt();
+                    AccountType accType;
+                    if (choice == 1) {
+                        accType = AccountType.CHECKING;
+                    }
+                    else{
+                        accType = AccountType.SAVINGS;
+                    }
+                    accountService.openNewAccount(loggedInUserId, accType);
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
@@ -332,6 +341,7 @@ public class Main {
                     TransactionUtils.sortByAmountDescending(transactions);
                     break;
                 case 7:
+                    System.out.println("Please enter the date in yyyy-mm-dd format: ");
                     String dateString = scanner.nextLine();
                     TransactionUtils.searchByDate(transactions, dateString);
                     break;

@@ -51,7 +51,7 @@ public class TransactionUtils {
                 }
             }
             if (showTransactions.isEmpty()){
-                System.out.println("No transactions on" + dateString);
+                System.out.println("No transactions on " + dateString + "!");
             }
             else{
                 System.out.println("Transactions on " + dateString + ":");

@@ -10,7 +10,6 @@ public class UserUtils {
 
     public UserUtils() {
     }
-
     public Map<Integer, User> getUsers() {
         return users;
     }

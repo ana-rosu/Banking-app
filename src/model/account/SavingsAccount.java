@@ -1,5 +1,8 @@
 package model.account;
 
+import model.transaction.Transaction;
+import model.transaction.TransactionType;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
@@ -70,6 +73,8 @@ public class SavingsAccount extends Account{
         }
         if (amount > 0 && (balance + amount) <= depositLimit) {
             balance += amount;
+            Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Deposit", new Date(), TransactionType.DEPOSIT);
+            transactionHistory.add(transaction);
             System.out.println("Deposited $" + amount + " into Savings Account.");
         } else {
             System.out.println("Invalid deposit amount or exceeding deposit limit.");
@@ -120,13 +125,12 @@ public class SavingsAccount extends Account{
     }
     @Override
     public String toString() {
-        return "SavingsAccount{" +
-                "startDate=" + startDate +
+        return "SavingsAccount{id=" + id  +
+                ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", interestRate=" + interestRate +
                 ", depositLimit=" + depositLimit +
                 ", withdrawalLimitPerMonth=" + withdrawalLimitPerMonth +
-                ", id=" + id +
                 ", IBAN='" + IBAN + '\'' +
                 ", balance=" + balance +
                 ", transactionHistory=" + transactionHistory +
