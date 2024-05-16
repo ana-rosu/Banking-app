@@ -1,5 +1,6 @@
 package service;
 
+import audit.AuditService;
 import model.account.Account;
 import model.account.AccountType;
 import model.account.CheckingAccount;
@@ -14,9 +15,11 @@ import java.util.List;
 // manages all accounts of a user
 public class AccountService {
     private UserUtils users;
+    private AuditService auditService;
 
     public AccountService(UserUtils users) {
         this.users = users;
+        this.auditService = AuditService.getInstance();
     }
     public Account getAccount(int userId, int accountId){
         User user = users.getUserById(userId);
@@ -42,6 +45,7 @@ public class AccountService {
             }
             sb.append("\n");
         }
+        auditService.logAction(String.format("user_%s_viewed_all_accounts", userId));
         return sb.toString();
     }
     public void openNewAccount(int userId, AccountType accType){
@@ -57,6 +61,8 @@ public class AccountService {
         List<Account> accounts = user.getAccountList();
         accounts.add(account);
         user.setAccountList(accounts);
+
+        auditService.logAction(String.format("user_%s_opened_new_account", userId));
     }
 
     public void generateStatement(Date fromDate, Date toDate, int userId, int accountId) {
@@ -75,5 +81,6 @@ public class AccountService {
                 System.out.println(transaction.getDate() + "\t" + transaction.getType() + "\t\t" + transaction.getAmount() + "\t\t" + transaction.getDescription());
         }
         System.out.println("------------------------------");
+        auditService.logAction(String.format("user_%s_generated_statement_for_acc_%s", userId, accountId));
     }
 }

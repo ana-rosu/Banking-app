@@ -1,5 +1,6 @@
 package service;
 
+import audit.AuditService;
 import model.account.CheckingAccount;
 import model.user.User;
 import utils.AccountUtils;
@@ -10,10 +11,12 @@ import java.util.ArrayList;
 public class UserService {
     private UserUtils users;
     private AccountUtils accounts;
+    private AuditService auditService;
 
     public UserService(UserUtils users, AccountUtils accounts) {
         this.users = users;
         this.accounts = accounts;
+        this.auditService = AuditService.getInstance();
     }
 
     public void registerUser(User user, double initialBalance) {
@@ -23,6 +26,8 @@ public class UserService {
         accounts.addAccount(checkingAccount);
         System.out.println("User created successfully with ID: " + user.getId());
         System.out.println("Checking account opened successfully for user: " + user.getId());
+
+        auditService.logAction(String.format("bank_registered_user_%s", user.getId()));
     }
     public boolean checkLogin(int userId){
         boolean isRegistered = users.isUserRegistered(userId);
@@ -45,6 +50,7 @@ public class UserService {
             System.out.println("Wrong password!");
             return false;
         } else {
+            auditService.logAction(String.format("user_%s_logged_in", userId));
             return true;
         }
     }
@@ -62,6 +68,7 @@ public class UserService {
             return false;
         }
         currentUser.setPassword();
+        auditService.logAction(String.format("user_%s_activated_account", userId));
         return true;
     }
 }

@@ -20,6 +20,7 @@ This banking application consists of multiple classes and services designed to f
 - Transactionable: Interface implemented by classes capable of handling deposits, withdrawals, transfers.
 - TransactionType: Enum representing types of financial transactions (e.g., deposit, withdrawal, transfer).
 - AccountStatus: Enum representing the status of a bank account (e.g., open, closed).
+- AccountType: Enum representing the type of a bank account (e.g., checking, savings)
   
 ## User Actions
 ### Customer actions
@@ -27,7 +28,8 @@ This banking application consists of multiple classes and services designed to f
 1) Activate account by setting up a password. The user must be registered by a bank representative first.
 2) Login
 3) View all accounts associated with the logged-in user
-4) Account Operations:
+4) Open a new account
+5) Account Operations:
     - Check the current balance of an account
     - View Transaction History:
         - Filter transactions by deposit or withdrawal
@@ -38,8 +40,6 @@ This banking application consists of multiple classes and services designed to f
     - Issue Debit Card associated with the account
     - View Card Details
     - Close Account
-  
-> Disclaimer! "Open a new account" functionality is not implemented yet! 
 
 ### Bank representative actions
 

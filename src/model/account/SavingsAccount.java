@@ -9,7 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 //intended for saving money over the long term by storing and accumulating funds over time
-//restrictions on the amount of withdrawal or transfers you can make per month
+//restrictions on the amount of withdrawal you can make per month
 //insurance up to certain limits, providing safety and security for deposited funds
 public class SavingsAccount extends Account{
     private final Date startDate, endDate;

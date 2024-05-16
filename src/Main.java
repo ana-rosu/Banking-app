@@ -1,3 +1,4 @@
+import audit.AuditService;
 import model.account.*;
 import model.card.Card;
 import model.transaction.Transaction;
@@ -129,6 +130,7 @@ public class Main {
                         return;
                     }
                     System.out.println("\nPassword: ");
+                    scanner.nextLine();
                     String password = scanner.nextLine();
                     if(userService.login(userId, password)) {
                         handleLoggedInCustomerMenu(scanner, userId);
@@ -369,12 +371,19 @@ public class Main {
 
         while (true) {
             displayMainMenu();
-            choice = scanner.nextInt();
-            scanner.nextLine();
+            try {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid integer.");
+                scanner.nextLine();
+                continue;  //restart loop
+            }
 
             switch (choice) {
                 case 0:
                     System.out.println("Exiting the application.");
+                    AuditService.getInstance().close();
                     return;
                 case 1:
                     handleBankMenu(scanner);
