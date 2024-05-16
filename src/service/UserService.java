@@ -1,12 +1,9 @@
 package service;
 
-import audit.AuditService;
 import model.account.CheckingAccount;
 import model.user.User;
 import utils.AccountUtils;
 import utils.UserUtils;
-
-import java.util.ArrayList;
 
 public class UserService {
     private UserUtils users;

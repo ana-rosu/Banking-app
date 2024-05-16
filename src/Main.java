@@ -1,4 +1,4 @@
-import audit.AuditService;
+import service.AuditService;
 import model.account.*;
 import model.card.Card;
 import model.transaction.Transaction;

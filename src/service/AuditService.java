@@ -1,4 +1,4 @@
-package audit;
+package service;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 //singleton and thread safe
 public class AuditService {
-    private static final String AUDIT_FILE_PATH = "./src/audit/audit.csv";
+    private static final String AUDIT_FILE_PATH = "./src/audit.csv";
     private static AuditService instance;
 
     private FileWriter writer;

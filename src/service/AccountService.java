@@ -1,6 +1,5 @@
 package service;
 
-import audit.AuditService;
 import model.account.Account;
 import model.account.AccountType;
 import model.account.CheckingAccount;
