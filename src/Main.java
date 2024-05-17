@@ -1,3 +1,4 @@
+import dao.AddressDAO;
 import service.AuditService;
 import model.account.*;
 import model.card.Card;
@@ -6,16 +7,21 @@ import model.transaction.TransactionType;
 import model.user.User;
 import model.user.Address;
 import service.AccountService;
+import service.DatabaseService;
 import service.UserService;
 import utils.AccountUtils;
 import utils.TransactionUtils;
 import utils.UserUtils;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Main {
+//    private static final DatabaseService databaseService = DatabaseService.getInstance();
     private static final UserUtils userUtils = new UserUtils();
     private static final AccountUtils accountUtils = new AccountUtils();
     private static final UserService userService = new UserService(userUtils, accountUtils);
@@ -353,47 +359,91 @@ public class Main {
         }
     }
     public static void main(String[] args) {
-        Address address1 = new Address("Virgo 23", "Bragadiru", "Ilfov", "RO");
-        CheckingAccount checkingAccount1 = new CheckingAccount(1000.0);
-        Date startDate = new Date();
-        Date endDate = new Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000);
-        SavingsAccount savingsAccount1 = new SavingsAccount(5000.0, startDate, endDate);
-        List<Account> accountList = new ArrayList<>();
-        accountList.add(checkingAccount1);
-        accountList.add(savingsAccount1);
-        User user1 = new User("Andrei", "Popescu", "andrei.popescu@example.com", "0883132981", new Date(94, Calendar.FEBRUARY, 1), address1, accountList);
-        accountUtils.addAccount(checkingAccount1);
-        accountUtils.addAccount(savingsAccount1);
-        userUtils.addUser(user1);
+//        Address address1 = new Address(1, "Fecioarei 23", "Bragadiru", "Ilfov", "RO");
+//        CheckingAccount checkingAccount1 = new CheckingAccount(1000.0);
+//        Date startDate = new Date();
+//        Date endDate = new Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000);
+//        SavingsAccount savingsAccount1 = new SavingsAccount(5000.0, startDate, endDate);
+//        List<Account> accountList = new ArrayList<>();
+//        accountList.add(checkingAccount1);
+//        accountList.add(savingsAccount1);
+//        User user1 = new User("Andrei", "Popescu", "andrei.popescu@example.com", "0883132981", new Date(94, Calendar.FEBRUARY, 1), address1, accountList);
+//        accountUtils.addAccount(checkingAccount1);
+//        accountUtils.addAccount(savingsAccount1);
+//        userUtils.addUser(user1);
+//
+//        Scanner scanner = new Scanner(System.in);
+//        int choice;
+//
+//        while (true) {
+//            displayMainMenu();
+//            try {
+//                choice = scanner.nextInt();
+//                scanner.nextLine();
+//            } catch (InputMismatchException e) {
+//                System.out.println("Invalid input. Please enter a valid integer.");
+//                scanner.nextLine();
+//                continue;  //restart loop
+//            }
+//
+//            switch (choice) {
+//                case 0:
+//                    System.out.println("Exiting the application.");
+//                    AuditService.getInstance().close();
+//                    return;
+//                case 1:
+//                    handleBankMenu(scanner);
+//                    break;
+//                case 2:
+//                    handleCustomerMenu(scanner);
+//                    break;
+//                default:
+//                    System.out.println("Invalid choice. Please try again.");
+//            }
+//        }
+        String url = "jdbc:oracle:thin:@localhost:1521:xe";
+        String username = "c##anar";
+        String password = "anar";
+        try{
+            Class.forName("oracle.jdbc.OracleDriver");
+            try (Connection connection = DriverManager.getConnection(url, username, password)) {
+                AddressDAO addressDAO = new AddressDAO(connection);
 
-        Scanner scanner = new Scanner(System.in);
-        int choice;
+                // Test create method
+                Address newAddress = new Address();
+                newAddress.setStreet("Lalelelor 2");
+                newAddress.setCity("Florilor");
+                newAddress.setCounty("Plantelor");
+                newAddress.setCountry("Cosmos");
+                addressDAO.create(newAddress);
+                System.out.println("Created Address with ID: " + newAddress.getId());
 
-        while (true) {
-            displayMainMenu();
-            try {
-                choice = scanner.nextInt();
-                scanner.nextLine();
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a valid integer.");
-                scanner.nextLine();
-                continue;  //restart loop
-            }
+                // Test read method
+                Address readAddress = addressDAO.read(newAddress.getId());
+                System.out.println("Read Address: " + readAddress);
 
-            switch (choice) {
-                case 0:
-                    System.out.println("Exiting the application.");
-                    AuditService.getInstance().close();
-                    return;
-                case 1:
-                    handleBankMenu(scanner);
-                    break;
-                case 2:
-                    handleCustomerMenu(scanner);
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                // Test update method
+                readAddress.setStreet("Zambilelor 456");
+                addressDAO.update(readAddress);
+                Address updatedAddress = addressDAO.read(readAddress.getId());
+                System.out.println("Updated Address: " + updatedAddress);
+
+                // Test delete method
+                addressDAO.delete(updatedAddress.getId());
+                Address deletedAddress = addressDAO.read(updatedAddress.getId());
+                if (deletedAddress == null) {
+                    System.out.println("Address successfully deleted.");
+                } else {
+                    System.out.println("Failed to delete Address.");
+                }
+
+            } catch (SQLException e) {
+                System.err.println("Database connection error: " + e.getMessage());
             }
         }
+        catch(ClassNotFoundException e){
+            System.err.println(e.getMessage());
+        }
+
     }
 }
