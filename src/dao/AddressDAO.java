@@ -14,10 +14,7 @@ public class AddressDAO implements GenericDAO<Address> {
     public void create(Address address) {
         String sql = "INSERT INTO address (street, city, county, country) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, address.getStreet());
-            stmt.setString(2, address.getCity());
-            stmt.setString(3, address.getCounty());
-            stmt.setString(4, address.getCountry());
+            this.setParameters(stmt, address.getStreet(), address.getCity(), address.getCounty(), address.getCountry());
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 1) {
@@ -27,12 +24,8 @@ public class AddressDAO implements GenericDAO<Address> {
                     if (rs.next()) {
                         int generatedId = rs.getInt(1);
                         address.setId(generatedId);
-                    } else {
-                        throw new SQLException("No generated key was retrieved.");
                     }
                 }
-            } else {
-                throw new SQLException("Insert failed, no rows affected.");
             }
         } catch (SQLException e) {
             System.err.println("Error creating address: " + e.getMessage());
@@ -58,42 +51,25 @@ public class AddressDAO implements GenericDAO<Address> {
         }
     }
 
-    @Override
     public void update(Address address) {
         String sql = "UPDATE address SET street = ?, city = ?, county = ?, country = ? WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
-            stmt.setString(1, address.getStreet());
-            stmt.setString(2, address.getCity());
-            stmt.setString(3, address.getCounty());
-            stmt.setString(4, address.getCountry());
-            stmt.setInt(5, address.getId());
-            int rowsUpdated = stmt.executeUpdate();
+            this.setParameters(stmt, address.getStreet(), address.getCity(), address.getCounty(), address.getCountry(), address.getId());
+            stmt.executeUpdate();
 
-            if (rowsUpdated == 0) {
-                System.out.println("Address not found! No rows updated.");
-            } else {
-                System.out.println("Address updated successfully.");
-            }
         }catch(SQLException e){
             System.err.println("Error updating address: " + e.getMessage());
         }
     }
 
-    @Override
     public void delete(int id) {
         String sql = "DELETE FROM address WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
             stmt.setInt(1, id);
-            int rowsDeleted = stmt.executeUpdate();
-
-            if (rowsDeleted == 0){
-                System.out.println("Address not found! No rows deleted.");
-            }else{
-                System.out.println("Address deleted successfully");
-            }
+            stmt.executeUpdate();
         }
         catch(SQLException e){
-            System.err.println("Error deleeting address: " + e.getMessage());
+            System.err.println("Error deleting address: " + e.getMessage());
         }
     }
 }

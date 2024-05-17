@@ -1,5 +1,6 @@
 package service;
 
+import dao.UserDAO;
 import model.account.CheckingAccount;
 import model.user.User;
 import utils.AccountUtils;
@@ -24,6 +25,7 @@ public class UserService {
         System.out.println("User created successfully with ID: " + user.getId());
         System.out.println("Checking account opened successfully for user: " + user.getId());
 
+//        userDAO.create(user);
         auditService.logAction(String.format("bank_registered_user_%s", user.getId()));
     }
     public boolean checkLogin(int userId){

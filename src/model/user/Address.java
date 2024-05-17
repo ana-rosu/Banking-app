@@ -3,9 +3,13 @@ package model.user;
 import java.util.Scanner;
 
 public class Address {
+    private int id;
     private String street, city, county, country;
+    public Address(){
 
-    public Address(String street, String city, String county, String country) {
+    }
+    public Address(int id, String street, String city, String county, String country) {
+        this.id = id;
         this.street = street;
         this.city = city;
         this.county = county;
@@ -26,6 +30,14 @@ public class Address {
     @Override
     public String toString() {
         return street + ", " + city + ", "  + county + ", " + country;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getStreet() {
