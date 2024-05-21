@@ -21,6 +21,11 @@ public class DatabaseService {
     public DatabaseService() throws SQLException {
         connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
     public void close() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();

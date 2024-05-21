@@ -2,7 +2,6 @@ package dao;
 
 import interfaces.GenericDAO;
 import model.account.Account;
-import model.card.Card;
 import model.user.Address;
 import model.user.User;
 
@@ -10,7 +9,7 @@ import java.sql.*;
 import java.util.List;
 
 public class UserDAO implements GenericDAO<User> {
-    private Connection connection;
+    private final Connection connection;
     public UserDAO(Connection connection){
         this.connection = connection;
     }
@@ -45,7 +44,7 @@ public class UserDAO implements GenericDAO<User> {
                 if (resultSet.next()) {
                     Address addr = getAddress(resultSet.getInt("addressId"));
                     List<Account> accList = getAccountsForUser(id);
-                    return new User(resultSet.getInt("id"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getString("email"), resultSet.getString("phoneNumber"), resultSet.getDate("dateOfBirth"), addr, accList); // create an Card object from the retrieved data
+                    return new User(resultSet.getInt("id"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getString("email"), resultSet.getString("phoneNumber"), resultSet.getDate("dateOfBirth"), addr, accList); // create a User object from the retrieved data
                 } else {
                     return null;  // card with the specified id was not found
                 }
@@ -67,7 +66,7 @@ public class UserDAO implements GenericDAO<User> {
     public void update(User user) {
         String sql = "UPDATE usr SET firstName = ?, lastName = ?, email = ?, passwrd = ?, phoneNumber = ?, dateOfBirth = ?, addressId = ? WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
-            this.setParameters(stmt, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(),new java.sql.Date(user.getDateOfBirth().getTime()), user.getAddress().getId());
+            this.setParameters(stmt, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(), new java.sql.Date(user.getDateOfBirth().getTime()), user.getAddress().getId());
             stmt.executeUpdate();
         }catch(SQLException e){
             System.err.println("Error updating user: " + e.getMessage());

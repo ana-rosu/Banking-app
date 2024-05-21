@@ -1,12 +1,10 @@
 package model.account;
 
+import model.card.Card;
 import model.transaction.Transaction;
 import model.transaction.TransactionType;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 //intended for saving money over the long term by storing and accumulating funds over time
 //restrictions on the amount of withdrawal you can make per month
@@ -19,9 +17,16 @@ public class SavingsAccount extends Account{
     private final double withdrawalLimitPerMonth;
     private int lastWithdrawalMonth;
     private double totalWithdrawalAmountThisMonth;
-    private double transferFees;
-
-
+    private final double transferFees;
+    public SavingsAccount(int id, String IBAN, Double balance, AccountStatus accountStatus, int userId, Card linkedCard, List<Transaction> transactionHistory, Date startDate, Date endDate, double interestRate, double depositLimit, double withdrawalLimitPerMonth, double transferFees){
+        super(id, IBAN, balance, accountStatus, userId, linkedCard, transactionHistory);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.interestRate = interestRate;
+        this.depositLimit = depositLimit;
+        this.withdrawalLimitPerMonth = withdrawalLimitPerMonth;
+        this.transferFees = transferFees;
+    }
     public SavingsAccount(double balance, Date startDate, Date endDate) {
         super(balance);
         this.startDate = startDate;
@@ -35,12 +40,13 @@ public class SavingsAccount extends Account{
         scheduleInterestCallbacks(); // schedule interest callbacks every other 3 months
     }
 
-    public SavingsAccount(double balance, Date startDate, Date endDate, double interestRate, double depositLimit, double withdrawalLimitPerMonth) {
+    public SavingsAccount(double balance, Date startDate, Date endDate, double interestRate, double depositLimit, double transferFees, double withdrawalLimitPerMonth) {
         super(balance);
         this.startDate = startDate;
         this.endDate = endDate;
         this.interestRate = interestRate;
         this.depositLimit = depositLimit;
+        this.transferFees = transferFees;
         this.withdrawalLimitPerMonth = withdrawalLimitPerMonth;
         this.interestTimer = new Timer();
         scheduleInterestCallbacks();
@@ -73,7 +79,7 @@ public class SavingsAccount extends Account{
         }
         if (amount > 0 && (balance + amount) <= depositLimit) {
             balance += amount;
-            Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Deposit", new Date(), TransactionType.DEPOSIT);
+            Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Deposit", new Date(), TransactionType.DEPOSIT, this.id);
             transactionHistory.add(transaction);
             System.out.println("Deposited $" + amount + " into Savings Account.");
         } else {
@@ -123,6 +129,39 @@ public class SavingsAccount extends Account{
             interestTimer.cancel();
         }
     }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public double getInterestRate() {
+        return interestRate;
+    }
+
+    public double getDepositLimit() {
+        return depositLimit;
+    }
+
+    public double getWithdrawalLimitPerMonth() {
+        return withdrawalLimitPerMonth;
+    }
+
+    public int getLastWithdrawalMonth() {
+        return lastWithdrawalMonth;
+    }
+
+    public double getTotalWithdrawalAmountThisMonth() {
+        return totalWithdrawalAmountThisMonth;
+    }
+
+    public double getTransferFees() {
+        return transferFees;
+    }
+
     @Override
     public String toString() {
         return "SavingsAccount{id=" + id  +

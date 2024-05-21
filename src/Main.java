@@ -401,49 +401,50 @@ public class Main {
 //                    System.out.println("Invalid choice. Please try again.");
 //            }
 //        }
-        String url = "jdbc:oracle:thin:@localhost:1521:xe";
-        String username = "c##anar";
-        String password = "anar";
-        try{
-            Class.forName("oracle.jdbc.OracleDriver");
-            try (Connection connection = DriverManager.getConnection(url, username, password)) {
-                AddressDAO addressDAO = new AddressDAO(connection);
+        try {
+            DatabaseService db = new DatabaseService();
+            try {
+                Class.forName("oracle.jdbc.OracleDriver");
+                try (Connection connection = db.getConnection()) {
+                    AddressDAO addressDAO = new AddressDAO(connection);
 
-                // Test create method
-                Address newAddress = new Address();
-                newAddress.setStreet("Lalelelor 2");
-                newAddress.setCity("Florilor");
-                newAddress.setCounty("Plantelor");
-                newAddress.setCountry("Cosmos");
-                addressDAO.create(newAddress);
-                System.out.println("Created Address with ID: " + newAddress.getId());
+                    // Test create method
+                    Address newAddress = new Address();
+                    newAddress.setStreet("Lalelelor 2");
+                    newAddress.setCity("Florilor");
+                    newAddress.setCounty("Plantelor");
+                    newAddress.setCountry("Cosmos");
+                    addressDAO.create(newAddress);
+                    System.out.println("Created Address with ID: " + newAddress.getId());
 
-                // Test read method
-                Address readAddress = addressDAO.read(newAddress.getId());
-                System.out.println("Read Address: " + readAddress);
+                    // Test read method
+                    Address readAddress = addressDAO.read(newAddress.getId());
+                    System.out.println("Read Address: " + readAddress);
 
-                // Test update method
-                readAddress.setStreet("Zambilelor 456");
-                addressDAO.update(readAddress);
-                Address updatedAddress = addressDAO.read(readAddress.getId());
-                System.out.println("Updated Address: " + updatedAddress);
+                    // Test update method
+                    readAddress.setStreet("Zambilelor 456");
+                    addressDAO.update(readAddress);
+                    Address updatedAddress = addressDAO.read(readAddress.getId());
+                    System.out.println("Updated Address: " + updatedAddress);
 
-                // Test delete method
-                addressDAO.delete(updatedAddress.getId());
-                Address deletedAddress = addressDAO.read(updatedAddress.getId());
-                if (deletedAddress == null) {
-                    System.out.println("Address successfully deleted.");
-                } else {
-                    System.out.println("Failed to delete Address.");
+                    // Test delete method
+                    addressDAO.delete(updatedAddress.getId());
+                    Address deletedAddress = addressDAO.read(updatedAddress.getId());
+                    if (deletedAddress == null) {
+                        System.out.println("Address successfully deleted.");
+                    } else {
+                        System.out.println("Failed to delete Address.");
+                    }
+
+                } catch (SQLException e) {
+                    System.err.println("Database connection error: " + e.getMessage());
                 }
-
-            } catch (SQLException e) {
-                System.err.println("Database connection error: " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                System.err.println(e.getMessage());
             }
         }
-        catch(ClassNotFoundException e){
+        catch(SQLException e){
             System.err.println(e.getMessage());
         }
-
     }
 }

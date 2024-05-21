@@ -1,7 +1,6 @@
 package dao;
 
 import interfaces.GenericDAO;
-import model.account.Account;
 import model.transaction.Transaction;
 import model.transaction.TransactionType;
 
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionDAO implements GenericDAO<Transaction> {
-    private Connection connection;
+    private final Connection connection;
     public TransactionDAO(Connection connection){
         this.connection = connection;
     }
@@ -41,7 +40,14 @@ public class TransactionDAO implements GenericDAO<Transaction> {
             stmt.setInt(1, id);
             try (ResultSet resultSet = stmt.executeQuery()) {
                 if (resultSet.next()) {
-                    return new Transaction(resultSet.getInt("id"), resultSet.getString("fromIBAN"), resultSet.getString("toIBAN"), resultSet.getDate("transactionDate"), resultSet.getDouble("amount"), resultSet.getString("descrip"), TransactionType.valueOf(resultSet.getString("transactionType")), resultSet.getInt("accountId")); // create an Transaction object from the retrieved data
+                    return new Transaction(resultSet.getInt("id"),
+                            resultSet.getString("fromIBAN"),
+                            resultSet.getString("toIBAN"),
+                            resultSet.getDate("transactionDate"),
+                            resultSet.getDouble("amount"),
+                            resultSet.getString("descrip"),
+                            TransactionType.valueOf(resultSet.getString("transactionType")),
+                            resultSet.getInt("accountId")); // create a Transaction object from the retrieved data
                 } else {
                     return null;  // transaction with the specified id was not found
                 }
@@ -53,12 +59,13 @@ public class TransactionDAO implements GenericDAO<Transaction> {
     }
     public List<Transaction> selectAllWhereAccId(int accId) throws SQLException {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM Transaction WHERE accId = ?";
+        String sql = "SELECT id FROM Transaction WHERE accId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, accId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Transaction transaction = new Transaction(rs.getInt("id"), rs.getString("fromIBAN"), rs.getString("toIBAN"), rs.getDate("transactionDate"), rs.getDouble("amount"), rs.getString("descrip"), TransactionType.valueOf(rs.getString("transactionType")), rs.getInt("accountId"));
+                    int id = rs.getInt(1);
+                    Transaction transaction = this.read(id);
                     transactions.add(transaction);
                 }
             }

@@ -21,13 +21,14 @@ public class Transaction {
         this.accountId = accountId;
     }
 
-    public Transaction(String fromIBAN, String toIBAN, double amount, String description, Date date, TransactionType type) {
+    public Transaction(String fromIBAN, String toIBAN, double amount, String description, Date date, TransactionType type, int accountId) {
         this.fromIBAN = fromIBAN;
         this.toIBAN = toIBAN;
         this.amount = amount;
         this.description = description;
         this.date = date;
         this.type = type;
+        this.accountId = accountId;
     }
 
     @Override
