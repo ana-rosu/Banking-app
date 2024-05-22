@@ -14,8 +14,12 @@ import java.util.List;
 
 public class AccountDAO implements GenericDAO<Account> {
     private Connection connection;
-    public AccountDAO(Connection connection){
+    private CardDAO cardDAO;
+    private TransactionDAO transactionDAO;
+    public AccountDAO(Connection connection, CardDAO cardDAO, TransactionDAO transactionDAO){
         this.connection = connection;
+        this.cardDAO = cardDAO;
+        this.transactionDAO = transactionDAO;
     }
 
     public void create(Account account){
@@ -30,6 +34,16 @@ public class AccountDAO implements GenericDAO<Account> {
                         int generatedId = rs.getInt(1);
                         account.setId(generatedId);
 
+                        // insert transactions
+                        for (Transaction transaction : account.getTransactionHistory()) {
+                            if (transaction.getId() == 0) {
+                                transactionDAO.create(transaction);
+                            }
+                        }
+                        // insert its linked card if it was emitted
+                        if (account.getLinkedCard() != null){
+                            cardDAO.create(account.getLinkedCard());
+                        }
                         if (account instanceof CheckingAccount) {
                             insertCheckingAccount((CheckingAccount) account);
                         } else {
@@ -82,8 +96,8 @@ public class AccountDAO implements GenericDAO<Account> {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Card linkedCard = getLinkedCard(rs.getInt("cardId"));
-                    List<Transaction> transactions = getTransactionsForAccount(id);
+                    Card linkedCard = cardDAO.read((rs.getInt("cardId")));
+                    List<Transaction> transactions = transactionDAO.selectAllWhereAccId(id);;
                     CheckingAccount ca = new CheckingAccount(
                             rs.getInt("id"),
                             rs.getString("IBAN"),
@@ -104,8 +118,8 @@ public class AccountDAO implements GenericDAO<Account> {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Card linkedCard = getLinkedCard(rs.getInt("cardId"));
-                    List<Transaction> transactions = getTransactionsForAccount(id);
+                    Card linkedCard = cardDAO.read((rs.getInt("cardId")));
+                    List<Transaction> transactions = transactionDAO.selectAllWhereAccId(id);;
                     SavingsAccount sa = new SavingsAccount(
                             rs.getInt("id"),
                             rs.getString("IBAN"),
@@ -129,20 +143,18 @@ public class AccountDAO implements GenericDAO<Account> {
         }
         return null;
     }
-    protected Card getLinkedCard(int cardId) {
-        CardDAO cardDAO = new CardDAO(connection);
-        return cardDAO.read(cardId);
-    }
-    protected List<Transaction> getTransactionsForAccount(int accId) throws SQLException {
-        TransactionDAO transactionDAO = new TransactionDAO(connection);
-        return transactionDAO.selectAllWhereAccId(accId);
-    }
-
     public void update(Account account){
         String sql = "UPDATE Account SET IBAN = ?, balance = ?, accountStatus = ?, userId = ?, cardId = ? WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
             this.setParameters(stmt, account.getIBAN(), account.getBalance(), account.getAccountStatus(), account.getUserId(), account.getLinkedCard().getId(), account.getId());
             stmt.executeUpdate();
+
+            // insert new transactions if transactionHistory has been updated
+            for (Transaction transaction : account.getTransactionHistory()) {
+                if (transaction.getId() == 0) {
+                    transactionDAO.create(transaction);
+                }
+            }
             if (account instanceof SavingsAccount) {
                 updateSavingsAccount((SavingsAccount) account);
             }
@@ -175,6 +187,14 @@ public class AccountDAO implements GenericDAO<Account> {
             } else {
                 deleteFromSavingsAccount(account.getId());
             }
+            //delete linked card if it was emitted
+            if (account.getLinkedCard() != null){
+                cardDAO.delete(account.getLinkedCard().getId());
+            }
+            //delete transactions associated with this account
+            for (Transaction transaction : account.getTransactionHistory()){
+                transactionDAO.delete(transaction.getId());
+            }
         }
         catch(SQLException e){
             System.err.println("Error deleting account: " + e.getMessage());
@@ -200,7 +220,7 @@ public class AccountDAO implements GenericDAO<Account> {
             throw e;
         }
     }
-    public List<Account> selectAllWhereUserId(int userId) throws SQLException {
+    public List<Account> selectAllWhereUserId(int userId) {
         List<Account> accounts = new ArrayList<>();
         String sql = "SELECT id FROM Account WHERE userId = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
@@ -211,6 +231,8 @@ public class AccountDAO implements GenericDAO<Account> {
                     accounts.add(this.read(id));
                 }
             }
+        }catch(SQLException e){
+            System.err.println("Error selecting accounts associated with user: " + e.getMessage());
         }
         return accounts;
     }
