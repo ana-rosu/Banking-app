@@ -12,7 +12,7 @@ public class CardDAO implements GenericDAO<Card> {
     }
     @Override
     public void create(Card card) {
-        String sql = "INSERT INTO card (cardNumber, cardHolderName, expiryDate, CVV) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Card (cardNumber, cardHolderName, expiryDate, CVV) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             this.setParameters(stmt, card.getCardNumber(), card.getCardHolderName(), card.getExpiryDate(), card.getCVV());
 
@@ -34,7 +34,7 @@ public class CardDAO implements GenericDAO<Card> {
 
     @Override
     public Card read(int id) {
-        String sql = "SELECT * FROM card WHERE id = ?";
+        String sql = "SELECT * FROM Card WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet resultSet = stmt.executeQuery()) {
@@ -50,19 +50,8 @@ public class CardDAO implements GenericDAO<Card> {
         }
     }
 
-    public void update(Card card) {
-        String sql = "UPDATE card SET street = ?, city = ?, county = ?, country = ? WHERE id = ?";
-        try(PreparedStatement stmt = connection.prepareStatement(sql)){
-            this.setParameters(stmt, card.getCardNumber(), card.getCardHolderName(), card.getExpiryDate(), card.getCVV());
-            stmt.executeUpdate();
-
-        }catch(SQLException e){
-            System.err.println("Error updating card: " + e.getMessage());
-        }
-    }
-
     public void delete(int id) {
-        String sql = "DELETE FROM card WHERE id = ?";
+        String sql = "DELETE FROM Card WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
             stmt.setInt(1, id);
             stmt.executeUpdate();

@@ -15,7 +15,7 @@ public class TransactionDAO implements GenericDAO<Transaction> {
     }
     @Override
     public void create(Transaction transaction) {
-        String sql = "INSERT INTO transaction (fromIBAN, toIBAN, transactionDate, amount, descrip, transactionType, accountId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Transaction (fromIBAN, toIBAN, transactionDate, amount, descrip, transactionType, accountId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             this.setParameters(stmt, transaction.getFromIBAN(), transaction.getToIBAN(), transaction.getDate(), transaction.getAmount(), transaction.getDescription(), transaction.getType().name(), transaction.getAccountId());
 
@@ -35,7 +35,7 @@ public class TransactionDAO implements GenericDAO<Transaction> {
     }
     @Override
     public Transaction read(int id) {
-        String sql = "SELECT * FROM transaction WHERE id = ?";
+        String sql = "SELECT * FROM Transaction WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet resultSet = stmt.executeQuery()) {
@@ -55,6 +55,16 @@ public class TransactionDAO implements GenericDAO<Transaction> {
         } catch (SQLException e) {
             System.err.println("Error reading transaction: " + e.getMessage());
             return null;
+        }
+    }
+    public void delete(int id){
+        String sql = "DELETE FROM Transaction WHERE id = ?";
+        try(PreparedStatement stmt = connection.prepareStatement(sql)){
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e){
+            System.err.println("Error deleting transaction: " + e.getMessage());
         }
     }
     public List<Transaction> selectAllWhereAccId(int accId) throws SQLException {
