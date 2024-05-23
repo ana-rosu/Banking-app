@@ -7,7 +7,9 @@ import model.user.User;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserDAO implements GenericDAO<User> {
     private final Connection connection;
@@ -21,24 +23,23 @@ public class UserDAO implements GenericDAO<User> {
     @Override
     public void create(User user) {
         try {
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO Usr (firstName, lastName, email, passwrd, phoneNumber, dateOfBirth, addressId) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            // insert user's address
+            addressDAO.create(user.getAddress());
+            // insert user's data
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO c##anar.USR (firstName, lastName, email, passwrd, phoneNumber, dateOfBirth, addressId) VALUES (?, ?, ?, ?, ?, ?, ?)");
             this.setParameters(stmt,  user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(), new java.sql.Date(user.getDateOfBirth().getTime()), user.getAddress().getId());
-            stmt.executeUpdate();
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 1) {
                 try (Statement queryStmt = connection.createStatement();
-                     ResultSet rs = queryStmt.executeQuery("SELECT user_id_seq.CURRVAL FROM dual")) {
+                     ResultSet rs = queryStmt.executeQuery("SELECT c##anar.user_id_seq.CURRVAL FROM dual")) {
                     if (rs.next()) {
                         int generatedId = rs.getInt(1);
                         user.setId(generatedId);
                     }
                 }
             }
-
-            // insert address
-            addressDAO.create(user.getAddress());
-            // insert accounts
+            // insert user's accounts
             for (Account account : user.getAccountList()) {
                 account.setUserId(user.getId());
                 accountDAO.create(account);
@@ -50,7 +51,7 @@ public class UserDAO implements GenericDAO<User> {
 
     @Override
     public User read(int id) {
-        String sql = "SELECT * FROM Usr WHERE id = ?";
+        String sql = "SELECT * FROM c##anar.USR WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet resultSet = stmt.executeQuery()) {
@@ -62,6 +63,7 @@ public class UserDAO implements GenericDAO<User> {
                             resultSet.getString("firstName"),
                             resultSet.getString("lastName"),
                             resultSet.getString("email"),
+                            resultSet.getString("passwrd"),
                             resultSet.getString("phoneNumber"),
                             resultSet.getDate("dateOfBirth"),
                             addr,
@@ -76,9 +78,9 @@ public class UserDAO implements GenericDAO<User> {
         }
     }
     public void update(User user) {
-        String sql = "UPDATE Usr SET firstName = ?, lastName = ?, email = ?, passwrd = ?, phoneNumber = ?, dateOfBirth = ?, addressId = ? WHERE id = ?";
+        String sql = "UPDATE USR SET firstName = ?, lastName = ?, email = ?, passwrd = ?, phoneNumber = ?, dateOfBirth = ?, addressId = ? WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
-            this.setParameters(stmt, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(), new java.sql.Date(user.getDateOfBirth().getTime()), user.getAddress().getId());
+            this.setParameters(stmt, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(), new java.sql.Date(user.getDateOfBirth().getTime()), user.getAddress().getId(), user.getId());
             stmt.executeUpdate();
             // update address
             addressDAO.update(user.getAddress());
@@ -97,7 +99,7 @@ public class UserDAO implements GenericDAO<User> {
         for (Account account : accounts) {
             accountDAO.delete(account);
         }
-        String sql = "DELETE FROM Usr WHERE id = ?";
+        String sql = "DELETE FROM USR WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
             stmt.setInt(1, id);
             stmt.executeUpdate();
@@ -107,14 +109,14 @@ public class UserDAO implements GenericDAO<User> {
         }
     }
 
-    public List<User> getAllUsers() {
-        List<User> users = new ArrayList<>();
-        String sql = "SELECT id FROM Usr";
+    public Map<Integer, User> getAllUsers() {
+        Map<Integer, User> users = new HashMap<>();
+        String sql = "SELECT id FROM USR";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
              while (rs.next()){
                  int id = rs.getInt(1);
-                 users.add(this.read(id));
+                 users.put(id, this.read(id));
              }
         }
         catch(SQLException e){
@@ -122,5 +124,18 @@ public class UserDAO implements GenericDAO<User> {
         }
         return users;
     }
-
+    public boolean isUserRegistered(int id){
+        String sql = "SELECT COUNT(*) FROM USR WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }catch (SQLException e){
+            System.err.println("Error checking if user is registered: " + e.getMessage());
+        }
+        return false;
+    }
 }

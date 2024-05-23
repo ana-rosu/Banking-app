@@ -15,9 +15,9 @@ public class TransactionDAO implements GenericDAO<Transaction> {
     }
     @Override
     public void create(Transaction transaction) {
-        String sql = "INSERT INTO Transaction (fromIBAN, toIBAN, transactionDate, amount, descrip, transactionType, accountId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Trnsaction (fromIBAN, toIBAN, transactionDate, amount, descrip, transactionType, accountId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            this.setParameters(stmt, transaction.getFromIBAN(), transaction.getToIBAN(), transaction.getDate(), transaction.getAmount(), transaction.getDescription(), transaction.getType().name(), transaction.getAccountId());
+            this.setParameters(stmt, transaction.getFromIBAN(), transaction.getToIBAN(), new java.sql.Date(transaction.getDate().getTime()), transaction.getAmount(), transaction.getDescription(), transaction.getType().name(), transaction.getAccountId());
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 1) {
@@ -35,7 +35,7 @@ public class TransactionDAO implements GenericDAO<Transaction> {
     }
     @Override
     public Transaction read(int id) {
-        String sql = "SELECT * FROM Transaction WHERE id = ?";
+        String sql = "SELECT * FROM Trnsaction WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet resultSet = stmt.executeQuery()) {
@@ -58,7 +58,7 @@ public class TransactionDAO implements GenericDAO<Transaction> {
         }
     }
     public void delete(int id){
-        String sql = "DELETE FROM Transaction WHERE id = ?";
+        String sql = "DELETE FROM Trnsaction WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
             stmt.setInt(1, id);
             stmt.executeUpdate();
@@ -69,7 +69,7 @@ public class TransactionDAO implements GenericDAO<Transaction> {
     }
     public List<Transaction> selectAllWhereAccId(int accId) throws SQLException {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT id FROM Transaction WHERE accId = ?";
+        String sql = "SELECT id FROM Trnsaction WHERE accountId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, accId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -79,6 +79,25 @@ public class TransactionDAO implements GenericDAO<Transaction> {
                     transactions.add(transaction);
                 }
             }
+        }
+        return transactions;
+    }
+    public List<Transaction> getTransactionsBetweenDatesForAcc(Date fromDate, Date toDate, int accountId){
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT id FROM Trnsaction WHERE accountId = ? AND transactionDate BETWEEN ? AND ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, accountId);
+            stmt.setDate(2, fromDate);
+            stmt.setDate(3, toDate);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while(rs.next()){
+                    int id = rs.getInt(1);
+                    transactions.add(this.read(id));
+                }
+            }
+        }catch(SQLException e){
+            System.err.println("Error getting transactions between dates: " + e.getMessage());
         }
         return transactions;
     }

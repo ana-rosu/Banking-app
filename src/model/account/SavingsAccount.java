@@ -171,9 +171,6 @@ public class SavingsAccount extends Account{
                 ", depositLimit=" + depositLimit +
                 ", withdrawalLimitPerMonth=" + withdrawalLimitPerMonth +
                 ", IBAN='" + IBAN + '\'' +
-                ", balance=" + balance +
-                ", transactionHistory=" + transactionHistory +
-                ", linkedCard=" + linkedCard +
                 '}';
     }
 }

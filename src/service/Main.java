@@ -1,3 +1,5 @@
+package service;
+
 import dao.*;
 import service.DatabaseService;
 import view.ConsoleMenu;

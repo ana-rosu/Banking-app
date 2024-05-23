@@ -14,7 +14,7 @@ public class CardDAO implements GenericDAO<Card> {
     public void create(Card card) {
         String sql = "INSERT INTO Card (cardNumber, cardHolderName, expiryDate, CVV) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            this.setParameters(stmt, card.getCardNumber(), card.getCardHolderName(), card.getExpiryDate(), card.getCVV());
+            this.setParameters(stmt, card.getCardNumber(), card.getCardHolderName(), new java.sql.Date(card.getExpiryDate().getTime()), card.getCVV());
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 1) {
@@ -40,14 +40,12 @@ public class CardDAO implements GenericDAO<Card> {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 if (resultSet.next()) {
                     return new Card(resultSet.getInt("id"), resultSet.getString("cardNumber"), resultSet.getString("cardHolderName"), resultSet.getDate("expiryDate"), resultSet.getInt("CVV")); // create an Card object from the retrieved data
-                } else {
-                    return null;  // card with the specified id was not found
                 }
             }
         } catch (SQLException e) {
             System.err.println("Error reading card: " + e.getMessage());
-            return null;
         }
+        return null;
     }
 
     public void delete(int id) {

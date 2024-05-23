@@ -11,7 +11,8 @@ import model.user.User;
 
 import java.sql.*;
 
-public class DatabaseService {
+// manages the database connection lifecycle by providing a method to get the connection and ensuring the connection is properly closed
+public class DatabaseService implements AutoCloseable {
     private static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
     private static final String USERNAME = "c##anar";
     private static final String PASSWORD = "anar";
@@ -26,6 +27,7 @@ public class DatabaseService {
         return connection;
     }
 
+    @Override
     public void close() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();

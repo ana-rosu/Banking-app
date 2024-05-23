@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 //individuals who interact with the banking application
 public class User {
     private int id;
-    static int contorId = 1;
     private String firstName;
     private String lastName;
     private String email;
@@ -23,15 +22,12 @@ public class User {
     private Address address;
 
     private List<Account> accountList;
-
-    {
-        this.id = contorId++;
-    }
-    public User(int id, String firstName, String lastName, String email, String phoneNumber, Date dateOfBirth, Address address, List<Account> accountList) {
+    public User(int id, String firstName, String lastName, String email, String password, String phoneNumber, Date dateOfBirth, Address address, List<Account> accountList) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.password = password;
         this.phoneNumber = phoneNumber;
         this.dateOfBirth = dateOfBirth;
         this.address = address;

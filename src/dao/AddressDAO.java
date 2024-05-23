@@ -35,7 +35,7 @@ public class AddressDAO implements GenericDAO<Address> {
 
     @Override
     public Address read(int id) {
-        String sql = "SELECT * FROM address WHERE id = ?";
+        String sql = "SELECT * FROM Address WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet resultSet = stmt.executeQuery()) {
@@ -52,7 +52,7 @@ public class AddressDAO implements GenericDAO<Address> {
     }
 
     public void update(Address address) {
-        String sql = "UPDATE address SET street = ?, city = ?, county = ?, country = ? WHERE id = ?";
+        String sql = "UPDATE Address SET street = ?, city = ?, county = ?, country = ? WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
             this.setParameters(stmt, address.getStreet(), address.getCity(), address.getCounty(), address.getCountry(), address.getId());
             stmt.executeUpdate();
@@ -63,7 +63,7 @@ public class AddressDAO implements GenericDAO<Address> {
     }
 
     public void delete(int id) {
-        String sql = "DELETE FROM address WHERE id = ?";
+        String sql = "DELETE FROM Address WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
             stmt.setInt(1, id);
             stmt.executeUpdate();

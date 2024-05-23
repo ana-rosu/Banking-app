@@ -246,7 +246,7 @@ public class ConsoleMenu {
                     Date from = DateValidator.parseDate(scanner, "FROM (yyyy-mm-dd): ", null, new Date());
                     Date to = DateValidator.parseDate(scanner, "TO (yyyy-mm-dd): ", from, new Date());
 
-                    accountService.generateStatement(from, to, loggedInUserId, accountId);
+                    accountService.generateStatement(from, to, accountId, loggedInUserId);
                     break;
                 case 4:
                     // Make a transfer

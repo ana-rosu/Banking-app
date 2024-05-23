@@ -7,10 +7,13 @@ import model.account.CheckingAccount;
 import model.account.SavingsAccount;
 import model.card.Card;
 import model.transaction.Transaction;
+import model.user.User;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AccountDAO implements GenericDAO<Account> {
     private Connection connection;
@@ -25,11 +28,20 @@ public class AccountDAO implements GenericDAO<Account> {
     public void create(Account account){
         String sql = "INSERT INTO Account (IBAN, balance, accountStatus, userId, cardId) VALUES (?, ?, ?, ?, ?)";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
-            setParameters(stmt, account.getIBAN(), account.getBalance(), account.getAccountStatus().name(), account.getUserId(), account.getLinkedCard().getId());
+            stmt.setString(1, account.getIBAN());
+            stmt.setDouble(2, account.getBalance());
+            stmt.setString(3, account.getAccountStatus().name());
+            stmt.setInt(4, account.getUserId());
+            if (account.getLinkedCard() != null) {
+                stmt.setInt(5, account.getLinkedCard().getId());
+            } else {
+                stmt.setNull(5, java.sql.Types.INTEGER);
+            }
+            System.out.println(account.getUserId());
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 1) {
                 try (Statement queryStmt = connection.createStatement();
-                     ResultSet rs = queryStmt.executeQuery("SELECT account_id_seq.CURRVAL FROM dual")) {
+                     ResultSet rs = queryStmt.executeQuery("SELECT c##anar.account_id_seq.CURRVAL FROM dual")) {
                     if (rs.next()) {
                         int generatedId = rs.getInt(1);
                         account.setId(generatedId);
@@ -55,7 +67,7 @@ public class AccountDAO implements GenericDAO<Account> {
         }
 
         catch(SQLException e){
-            System.err.println(e.getMessage());
+            System.err.println("Error creating account: " + e.getMessage());
         }
     }
 
@@ -71,7 +83,7 @@ public class AccountDAO implements GenericDAO<Account> {
                 "withdrawalLimitPerMonth, lastWithdrawalMonth, totalWithdrawalAmountThisMonth, transferFees) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            setParameters(stmt, account.getId(), account.getStartDate(), account.getEndDate(), account.getInterestRate(),
+            setParameters(stmt, account.getId(), new java.sql.Date(account.getStartDate().getTime()), new java.sql.Date(account.getEndDate().getTime()), account.getInterestRate(),
                     account.getDepositLimit(), account.getWithdrawalLimitPerMonth(), account.getLastWithdrawalMonth(),
                     account.getTotalWithdrawalAmountThisMonth(), account.getTransferFees());
             stmt.executeUpdate();
@@ -79,15 +91,13 @@ public class AccountDAO implements GenericDAO<Account> {
     }
     public Account read(int id) {
         String sqlChecking =
-                "SELECT a.id, a.IBAN, a.balance, a.accountStatus, a.userId, a.cardId " +
+                        "SELECT * " +
                         "FROM Account a " +
                         "JOIN CheckingAccount ca ON a.id = ca.accountId " +
                         "WHERE a.id = ?";
 
         String sqlSavings =
-                "SELECT a.id, a.IBAN, a.balance, a.accountStatus, a.userId, a.cardId, " +
-                        "sa.startDate, sa.endDate, sa.interestRate, sa.depositLimit, " +
-                        "sa.withdrawalLimitPerMonth, sa.lastWithdrawalMonth, sa.totalWithdrawalAmountThisMonth, sa.transferFees " +
+                        "SELECT * " +
                         "FROM Account a " +
                         "JOIN SavingsAccount sa ON a.id = sa.accountId " +
                         "WHERE a.id = ?";
@@ -95,10 +105,10 @@ public class AccountDAO implements GenericDAO<Account> {
         try (PreparedStatement stmt = connection.prepareStatement(sqlChecking)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Card linkedCard = cardDAO.read((rs.getInt("cardId")));
+                if (rs.next()) {
+                    Card linkedCard = cardDAO.read(rs.getInt("cardId"));
                     List<Transaction> transactions = transactionDAO.selectAllWhereAccId(id);;
-                    CheckingAccount ca = new CheckingAccount(
+                    return new CheckingAccount(
                             rs.getInt("id"),
                             rs.getString("IBAN"),
                             rs.getDouble("balance"),
@@ -106,7 +116,6 @@ public class AccountDAO implements GenericDAO<Account> {
                             rs.getInt("userId"),
                             linkedCard,
                             transactions);
-                    return ca;
                 }
             }
         }
@@ -117,10 +126,10 @@ public class AccountDAO implements GenericDAO<Account> {
         try (PreparedStatement stmt = connection.prepareStatement(sqlSavings)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Card linkedCard = cardDAO.read((rs.getInt("cardId")));
+                if (rs.next()) {
+                    Card linkedCard = cardDAO.read(rs.getInt("cardId"));
                     List<Transaction> transactions = transactionDAO.selectAllWhereAccId(id);;
-                    SavingsAccount sa = new SavingsAccount(
+                    return new SavingsAccount(
                             rs.getInt("id"),
                             rs.getString("IBAN"),
                             rs.getDouble("balance"),
@@ -134,7 +143,6 @@ public class AccountDAO implements GenericDAO<Account> {
                             rs.getDouble("depositLimit"),
                             rs.getDouble("withdrawalLimitPerMonth"),
                             rs.getDouble("transferFees"));
-                    return sa;
                 }
             }
         }
@@ -146,7 +154,19 @@ public class AccountDAO implements GenericDAO<Account> {
     public void update(Account account){
         String sql = "UPDATE Account SET IBAN = ?, balance = ?, accountStatus = ?, userId = ?, cardId = ? WHERE id = ?";
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
-            this.setParameters(stmt, account.getIBAN(), account.getBalance(), account.getAccountStatus(), account.getUserId(), account.getLinkedCard().getId(), account.getId());
+            // check if linkedCard is not null before setting cardId
+            if (account.getLinkedCard() != null) {
+                this.setParameters(stmt, account.getIBAN(), account.getBalance(), account.getAccountStatus().name(), account.getUserId(), account.getLinkedCard().getId(), account.getId());
+            } else {
+                // if linkedCard is null, set cardId to null
+                stmt.setString(1, account.getIBAN());
+                stmt.setDouble(2, account.getBalance());
+                stmt.setString(3, account.getAccountStatus().name());
+                stmt.setInt(4, account.getUserId());
+                stmt.setNull(5, java.sql.Types.INTEGER);
+                stmt.setInt(6, account.getId());
+            }
+
             stmt.executeUpdate();
 
             // insert new transactions if transactionHistory has been updated
@@ -158,16 +178,17 @@ public class AccountDAO implements GenericDAO<Account> {
             if (account instanceof SavingsAccount) {
                 updateSavingsAccount((SavingsAccount) account);
             }
-        }catch(SQLException e){
+        } catch(SQLException e){
             System.err.println("Error updating account: " + e.getMessage());
         }
     }
+
     private void updateSavingsAccount(SavingsAccount account) throws SQLException {
         String sql = "UPDATE SavingsAccount SET startDate = ?, endDate = ?, interestRate = ?, depositLimit = ?, " +
                 "withdrawalLimitPerMonth = ?, lastWithdrawalMonth = ?, totalWithdrawalAmountThisMonth = ?, " +
                 "transferFees = ? WHERE accountId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            setParameters(stmt, account.getStartDate(), account.getEndDate(), account.getInterestRate(),
+            setParameters(stmt, new java.sql.Date(account.getStartDate().getTime()), new java.sql.Date(account.getEndDate().getTime()), account.getInterestRate(),
                     account.getDepositLimit(), account.getWithdrawalLimitPerMonth(), account.getLastWithdrawalMonth(),
                     account.getTotalWithdrawalAmountThisMonth(), account.getTransferFees(), account.getId());
             stmt.executeUpdate();
@@ -235,5 +256,24 @@ public class AccountDAO implements GenericDAO<Account> {
             System.err.println("Error selecting accounts associated with user: " + e.getMessage());
         }
         return accounts;
+    }
+
+    public Map<Integer, Account> getAllAccounts() {
+        Map<Integer, Account> accounts = new HashMap<>();
+        String sql = "SELECT id FROM Account";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()){
+                int id = rs.getInt(1);
+                accounts.put(id, this.read(id));
+            }
+        }
+        catch(SQLException e){
+            System.err.println("Error fetching accounts: " + e.getMessage());
+        }
+        return accounts;
+    }
+    public List<Transaction> generateTransactionsForStatement(Date fromDate, Date toDate, int id){
+        return transactionDAO.getTransactionsBetweenDatesForAcc(fromDate, toDate, id);
     }
 }

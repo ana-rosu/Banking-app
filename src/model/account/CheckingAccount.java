@@ -28,9 +28,6 @@ public class CheckingAccount extends Account {
         return "CheckingAccount{" +
                 "id=" + id +
                 ", IBAN='" + IBAN + '\'' +
-                ", balance=" + balance +
-                ", transactionHistory=" + transactionHistory +
-                ", linkedCard=" + linkedCard +
                 '}';
     }
 }
