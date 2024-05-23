@@ -9,7 +9,6 @@ import java.util.*;
 
 public abstract class Account implements Transactionable {
     protected int id;
-    static int contorId = 1;
     protected String IBAN;
     protected double balance;
     protected AccountStatus accountStatus;
@@ -17,10 +16,6 @@ public abstract class Account implements Transactionable {
     protected Card linkedCard;
     protected List<Transaction> transactionHistory;
     static private Set<String> usedIBAN = new HashSet<>();
-
-    {
-        this.id = contorId++;
-    }
 
     public Account(int id, String IBAN, Double balance, AccountStatus accountStatus, int userId, Card linkedCard, List<Transaction> transactionHistory) {
        this.id = id;
@@ -47,27 +42,37 @@ public abstract class Account implements Transactionable {
 
     @Override
     public void deposit(double amount) {
-        if(amount > 0){
+       deposit(amount, false);
+    }
+    public void deposit(double amount, boolean isTransfer) {
+        if (amount > 0) {
             setBalance(balance + amount);
-            Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Deposit", new Date(), TransactionType.DEPOSIT, this.id);
-            transactionHistory.add(transaction);
+            if(!isTransfer) {
+                Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Deposit", new Date(), TransactionType.DEPOSIT, this.id);
+                transactionHistory.add(transaction);
+            }
         }
     }
     @Override
     public boolean withdraw(double amount) {
-        if(amount > 0 && amount > balance){
+        return withdraw(amount, false);
+    }
+    public boolean withdraw(double amount, boolean isTransfer) {
+        if (amount > 0 && amount > balance) {
             System.out.println("Insufficient funds.");
             return false;
         }
         this.balance -= amount;
-        Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Withdrawal", new Date(), TransactionType.WITHDRAWAL, this.id);
-        this.transactionHistory.add(transaction);
+        if(!isTransfer) {
+            Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Withdrawal", new Date(), TransactionType.WITHDRAWAL, this.id);
+            this.transactionHistory.add(transaction);
+        }
         return true;
     }
 
     public void transfer(Account destination, double amount) {
-        if (amount > 0 && this.withdraw(amount)) {
-            destination.deposit(amount);
+        if (amount > 0 && this.withdraw(amount, true)) {
+            destination.deposit(amount, true);
             System.out.println("Transfer successful.");
             Transaction toDest = new Transaction(this.getIBAN(), destination.getIBAN(), amount, "Transfer to " + destination.getIBAN(), new Date(), TransactionType.TRANSFER, this.id);
             Transaction fromSource = new Transaction(this.getIBAN(), destination.getIBAN(), amount, "Transfer from " + this.getIBAN(), new Date(), TransactionType.TRANSFER, destination.getId());
@@ -128,6 +133,9 @@ public abstract class Account implements Transactionable {
 
     public int getUserId() {
         return userId;
+    }
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public void setTransactionHistory(List<Transaction> transactionHistory) {
