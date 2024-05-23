@@ -26,9 +26,10 @@ public class UserService {
     public void registerUser(User user, double initialBalance) {
         // automatically open a checking account when registering a new user
         CheckingAccount checkingAccount = new CheckingAccount(initialBalance);
+        userDAO.create(user);
+        checkingAccount.setUserId(user.getId());
         user.addCheckingAccount(checkingAccount);
         accountDAO.create(checkingAccount);
-        userDAO.create(user);
 
         System.out.println("User created successfully with ID: " + user.getId());
         System.out.println("Checking account opened successfully for user: " + user.getId());

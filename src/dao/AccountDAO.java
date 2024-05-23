@@ -37,7 +37,7 @@ public class AccountDAO implements GenericDAO<Account> {
             } else {
                 stmt.setNull(5, java.sql.Types.INTEGER);
             }
-            System.out.println(account.getUserId());
+
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 1) {
                 try (Statement queryStmt = connection.createStatement();

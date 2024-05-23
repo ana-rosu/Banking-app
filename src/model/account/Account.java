@@ -4,6 +4,7 @@ import model.card.Card;
 import model.transaction.Transaction;
 import interfaces.Transactionable;
 import model.transaction.TransactionType;
+import service.AuditService;
 
 import java.util.*;
 
@@ -16,6 +17,7 @@ public abstract class Account implements Transactionable {
     protected Card linkedCard;
     protected List<Transaction> transactionHistory;
     static private Set<String> usedIBAN = new HashSet<>();
+    private AuditService auditService;
 
     public Account(int id, String IBAN, Double balance, AccountStatus accountStatus, int userId, Card linkedCard, List<Transaction> transactionHistory) {
        this.id = id;
@@ -25,6 +27,7 @@ public abstract class Account implements Transactionable {
        this.userId = userId;
        this.linkedCard = linkedCard;
        this.transactionHistory = transactionHistory;
+       this.auditService = AuditService.getInstance();
     }
 
 
@@ -50,6 +53,7 @@ public abstract class Account implements Transactionable {
             if(!isTransfer) {
                 Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Deposit", new Date(), TransactionType.DEPOSIT, this.id);
                 transactionHistory.add(transaction);
+                auditService.logAction("deposit");
             }
         }
     }
@@ -66,6 +70,7 @@ public abstract class Account implements Transactionable {
         if(!isTransfer) {
             Transaction transaction = new Transaction(this.getIBAN(), this.getIBAN(), amount, "Withdrawal", new Date(), TransactionType.WITHDRAWAL, this.id);
             this.transactionHistory.add(transaction);
+            auditService.logAction("withdrawal");
         }
         return true;
     }
@@ -78,6 +83,7 @@ public abstract class Account implements Transactionable {
             Transaction fromSource = new Transaction(this.getIBAN(), destination.getIBAN(), amount, "Transfer from " + this.getIBAN(), new Date(), TransactionType.TRANSFER, destination.getId());
             transactionHistory.add(toDest);
             destination.transactionHistory.add(fromSource);
+            auditService.logAction("transfer");
         } else {
             System.out.println("Transfer failed. Insufficient funds.");
         }
@@ -152,5 +158,18 @@ public abstract class Account implements Transactionable {
                 ", linkedCard=" + linkedCard +
                 ", accountStatus=" + accountStatus +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return id == account.id && Double.compare(balance, account.balance) == 0 && Objects.equals(IBAN, account.IBAN);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, IBAN, balance);
     }
 }

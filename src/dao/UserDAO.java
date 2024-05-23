@@ -84,9 +84,11 @@ public class UserDAO implements GenericDAO<User> {
             stmt.executeUpdate();
             // update address
             addressDAO.update(user.getAddress());
-            // update accounts
-            for (Account account : user.getAccountList()) {
-                accountDAO.update(account);
+            // update inserted accounts
+            for (Account account : user.getAccountList()){
+                Account acc = accountDAO.read(account.getId());
+                acc.setUserId(user.getId());
+                accountDAO.update(acc);
             }
         }catch(SQLException e){
             System.err.println("Error updating user: " + e.getMessage());

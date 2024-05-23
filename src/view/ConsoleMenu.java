@@ -228,6 +228,7 @@ public class ConsoleMenu {
                     return;
                 case 1:
                     System.out.println("BALANCE: " + acc.getBalance());
+                    auditService.logAction(String.format("user_%s_viewed_balance", user.getId()));
                     break;
                 case 2:
                     System.out.println("---------------TRANSACTION-HISTORY---------------");
@@ -238,6 +239,7 @@ public class ConsoleMenu {
                     }
                     for(Transaction t : transactions)
                         System.out.println(t);
+                    auditService.logAction(String.format("user_%s_viewed_transaction_history", user.getId()));
                     handleTransactionsMenu(scanner, transactions);
                     break;
                 case 3:
@@ -281,6 +283,7 @@ public class ConsoleMenu {
                         break;
                     }
                     System.out.println(card);
+                    auditService.logAction(String.format("user_%s_viewed_card_details", user.getId()));
                     break;
                 case 8:
                     // Emit a debit card for this account
@@ -290,6 +293,7 @@ public class ConsoleMenu {
                         acc.setLinkedCard(card);
                         accountDAO.update(acc);
                         System.out.println("Card issued successfully!");
+                        auditService.logAction(String.format("user_%s_emitted_card", user.getId()));
                     }
                     else{
                         System.out.println("This account already has a card associated!");
@@ -301,6 +305,7 @@ public class ConsoleMenu {
                     acc.setAccountStatus(AccountStatus.CLOSED);
                     accountDAO.update(acc);
                     System.out.println("Account closed successfully!");
+                    auditService.logAction(String.format("user_%s_closed_account%s", user.getId(), acc.getId()));
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
